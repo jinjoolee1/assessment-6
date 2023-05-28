@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const bots = require("./src/botsData");
 const shuffle = require("./src/shuffle");
 
@@ -9,6 +10,54 @@ const playerRecord = {
 const app = express();
 
 app.use(express.json());
+
+
+var Rollbar = require("rollbar");
+var rollbar = new Rollbar({
+  accessToken: "a0c129e612314c12a17517e82dc2c03a",
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+rollbar.log("Hello world!");
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public"));
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
+});
+
+app.get("/styles", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.css"));
+});
+
+app.get("/js", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.js"));
+});
+
+app.get("/api/robots", (req, res) => {
+  try {
+    rollbar.info("See All Bots button successfully called");
+    res.status(200).send(bots);
+  } catch (error) {
+    rollbar.error("See All Bots not sent back correctly");
+    console.log("ERROR GETTING BOTS", error);
+    res.sendStatus(400);
+  }
+});
+
+app.get("/api/robots/five", (req, res) => {
+  try {
+    let shuffled = shuffleArray(bots);
+    let choices = shuffled.slice(0, 5);
+    let compDuo = shuffled.slice(6, 8);
+    res.status(200).send({ choices, compDuo });
+  } catch (error) {
+    console.log("ERROR GETTING FIVE BOTS", error);
+    res.sendStatus(400);
+  }
+});
 
 // Add up the total health of all the robots
 const calculateTotalHealth = (robots) =>

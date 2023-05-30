@@ -86,7 +86,7 @@ const calculateHealthAfterAttack = ({ playerDuo, compDuo }) => {
 
 app.get("/api/robots", (req, res) => {
   try {
-    res.status(200).send(botsArr);
+    res.status(200).send(bots);
   } catch (error) {
     console.error("ERROR GETTING BOTS", error);
     res.sendStatus(400);
